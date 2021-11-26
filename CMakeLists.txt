@@ -4,30 +4,37 @@ project(pcapplusplus_vendor)
 
 find_package(ament_cmake REQUIRED)
 
+set(pcappp_libs
+  libCommon++.a
+  libPacket++.a
+  libPcap++.a
+)
+
 macro(unpack_pcpp)
   include(ExternalProject)
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/install)
 
   externalproject_add(pcapplusplus-release
     URL https://github.com/seladb/PcapPlusPlus/releases/download/v21.11/pcapplusplus-21.11-ubuntu-20.04-gcc-9.tar.gz
     URL_HASH SHA256=3f5f3ac8d078a518bccb2ace7199a2d9e1810122a369cf8762052b2a6d44532b
     DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}
     BUILD_IN_SOURCE True
-    SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/install/
+    SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src/
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
   )
 
   install(
-    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/install/header/
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src/header/
     DESTINATION include
   )
 
-  file(GLOB pcappp_libs "${CMAKE_CURRENT_BINARY_DIR}/install/*.a")
+  foreach(L ${pcappp_libs} )
+    set(pcappp_lib_paths ${pcappp_lib_paths} ${CMAKE_CURRENT_BINARY_DIR}/src/${L})
+  endforeach(L)
 
   install(
-    FILES ${pcappp_libs}
+    FILES ${pcappp_lib_paths}
     DESTINATION lib
   )
 
